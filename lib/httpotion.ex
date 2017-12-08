@@ -60,6 +60,8 @@ defmodule HTTPotion.Base do
       def process_response_body(body = {:file, filename}), do: IO.iodata_to_binary(filename)
       def process_response_body(body), do: IO.iodata_to_binary(body)
 
+      def process_response_body(body, _headers), do: process_response_body(body)
+
       def process_response_chunk(body = {:file, filename}), do: IO.iodata_to_binary(filename)
       def process_response_chunk(chunk = {:error, error}), do: chunk
       def process_response_chunk(raw) when is_tuple(raw), do: raw
@@ -251,13 +253,13 @@ defmodule HTTPotion.Base do
             %HTTPotion.Response{
               status_code: process_status_code(status_code),
               headers: process_response_headers(headers),
-              body: process_response_body(body)
+              body: process_response_body(body, headers)
             }
           { :ok, status_code, headers, body } ->
             %HTTPotion.Response{
               status_code: process_status_code(status_code),
               headers: process_response_headers(headers),
-              body: process_response_body(body)
+              body: process_response_body(body, headers)
             }
           { :ibrowse_req_id, id } ->
             %HTTPotion.AsyncResponse{ id: id }
